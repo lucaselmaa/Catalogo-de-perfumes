@@ -1,0 +1,2415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Perfumes Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .font-inter { font-family: 'Inter', sans-serif; }
+        
+        .perfume-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .perfume-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            border-color: rgba(255,215,0,0.5);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .search-glow {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+        
+        .filter-btn {
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .filter-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: rgba(255, 215, 0, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #000;
+            border-color: #ffd700;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f0f23 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+        }
+        
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+        }
+        
+        .overlay-info {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.8) 100%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .perfume-card:hover .overlay-info {
+            opacity: 1;
+        }
+        
+        .brand-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #000;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+        
+        .notes-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .filter-section {
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .filter-category {
+            margin-bottom: 1rem;
+        }
+
+        .filter-category h3 {
+            color: #ffd700;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .filter-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .concentration-badge {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .edt-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .edp-badge {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        .parfum-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        @media (max-width: 768px) {
+            .filter-grid {
+                justify-content: center;
+            }
+            
+            .filter-btn {
+                font-size: 0.75rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 font-inter text-white">
+    <!-- Hero Section -->
+    <header class="hero-bg min-h-screen flex items-center justify-center relative">
+        <div class="floating-particles">
+            <div class="particle" style="width: 4px; height: 4px; left: 10%; top: 20%; animation-delay: 0s;"></div>
+            <div class="particle" style="width: 6px; height: 6px; left: 20%; top: 60%; animation-delay: 1s;"></div>
+            <div class="particle" style="width: 3px; height: 3px; left: 70%; top: 30%; animation-delay: 2s;"></div>
+            <div class="particle" style="width: 5px; height: 5px; left: 80%; top: 70%; animation-delay: 3s;"></div>
+            <div class="particle" style="width: 4px; height: 4px; left: 50%; top: 10%; animation-delay: 4s;"></div>
+        </div>
+        
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <h1 class="font-playfair text-7xl md:text-9xl font-bold mb-8 gradient-text">
+                REPLICA NOIR
+            </h1>
+            <p class="text-2xl md:text-4xl text-gray-300 mb-6 font-light tracking-wide">
+                catalogo de perfumes alternativos
+            </p>
+            <p class="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+                Descubre tu fragancia perfecta en nuestra colección exclusiva de perfumes de lujo
+            </p>
+            
+            <!-- Search Bar -->
+            <div class="max-w-3xl mx-auto mb-16">
+                <div class="glass-effect rounded-full p-3 search-glow">
+                    <div class="flex items-center">
+                        <div class="flex-1 flex items-center">
+                            <svg class="w-6 h-6 text-yellow-400 ml-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input 
+                                type="text" 
+                                id="searchInput" 
+                                placeholder="Buscar por nombre, marca o notas olfativas..."
+                                class="flex-1 bg-transparent text-white placeholder-gray-400 outline-none text-lg py-3"
+                            >
+                        </div>
+                        <button class="bg-gradient-to-r from-yellow-600 to-yellow-400 text-black px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Scroll Indicator -->
+            <div class="animate-bounce">
+                <svg class="w-8 h-8 text-yellow-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <!-- Advanced Filters Section -->
+    <section class="filter-section py-6">
+        <div class="container mx-auto px-6">
+            <!-- Filtros Principales -->
+            <div class="filter-category">
+                <h3>Categorías Principales</h3>
+                <div class="filter-grid">
+                    <button class="filter-btn active px-4 py-2 rounded-full text-white font-medium transition-all duration-300" data-filter="all" data-type="main">
+                        Todos (250+)
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-white font-medium transition-all duration-300" data-filter="hombre" data-type="gender">
+                        Hombre
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-white font-medium transition-all duration-300" data-filter="mujer" data-type="gender">
+                        Mujer
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-white font-medium transition-all duration-300" data-filter="unisex" data-type="gender">
+                        Unisex
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros por Concentración -->
+            <div class="filter-category">
+                <h3>Concentración</h3>
+                <div class="filter-grid">
+                    <button class="filter-btn px-4 py-2 rounded-full text-white font-medium transition-all duration-300" data-filter="EDT" data-type="concentration">
+                        EDT (Eau de Toilette)
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-white font-medium transition-all duration-300" data-filter="EDP" data-type="concentration">
+                        EDP (Eau de Parfum)
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-white font-medium transition-all duration-300" data-filter="Parfum" data-type="concentration">
+                        Parfum
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros por Familia Olfativa -->
+            <div class="filter-category">
+                <h3>Familia Olfativa</h3>
+                <div class="filter-grid">
+                    <button class="filter-btn px-4 py-2 rounded-full text-white font-medium transition-all duration-300" data-filter="oriental" data-type="category">
+                        Oriental
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-white font-medium transition-all duration-300" data-filter="fresco" data-type="category">
+                        Fresco
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-white font-medium transition-all duration-300" data-filter="floral" data-type="category">
+                        Floral
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-white font-medium transition-all duration-300" data-filter="aromático" data-type="category">
+                        Aromático
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-white font-medium transition-all duration-300" data-filter="amaderado" data-type="category">
+                        Amaderado
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros por Marca (Top Marcas) -->
+            <div class="filter-category">
+                <h3>Marcas Populares</h3>
+                <div class="filter-grid"><div id="brandFilters" class="filter-grid"></div></div>
+            </div>
+
+            <!-- Botón para limpiar filtros -->
+            <div class="text-center mt-4">
+                <button id="clearFilters" class="glass-effect px-6 py-2 rounded-full text-yellow-300 font-medium hover:bg-yellow-600/20 transition-all duration-300">
+                    Limpiar Filtros
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Counter -->
+    <div class="container mx-auto px-6 py-6">
+        <p id="resultsCounter" class="text-gray-400 text-center text-lg">Mostrando 250+ perfumes</p>
+        <div id="activeFilters" class="flex flex-wrap justify-center gap-2 mt-4"></div>
+    </div>
+
+    <!-- Perfumes Grid -->
+    <main class="container mx-auto px-6 pb-20">
+        <div id="perfumesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+            <!-- Los perfumes se cargarán aquí dinámicamente -->
+        </div>
+        
+        <!-- No results message -->
+        <div id="noResults" class="hidden text-center py-20">
+            <div class="glass-effect rounded-2xl p-12 max-w-md mx-auto">
+                <div class="text-yellow-400 mb-6">
+                    <svg class="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33"></path>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-playfair font-bold text-white mb-4">No se encontraron perfumes</h3>
+                <p class="text-gray-400 text-lg">Intenta con otros términos de búsqueda o filtros</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+
+
+
+
+const perfumes = [
+{
+                name: "Armaf Club de Nuit Imperiale (White Imperiale) EDP",
+                brand: "Armaf",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: lichi, bergamota, nuez moscada. Corazón: rosa turca, peonía, vainilla, almizcle. Fondo: vainilla, incienso, cashmeran y cedro.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_631987-MLA71615701671_092023-F.webp"
+            },
+{
+                name: "Armaf Club de Nuit Untold EDP",
+                brand: "Armaf",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: bergamota, limón, pimienta negra. Corazón: lavanda, geranio, especias. Fondo: ámbar, pachuli, vetiver.",
+                image: "https://http2.mlstatic.com/D_Q_NP_2X_897800-MLA54976209914_042023-E.webp"
+            },
+{
+                name: "Barakkat Rouge 540 Extrait",
+                brand: "Barakkat",
+                type: "unisex",
+                category: "oriental",
+                concentration: "Parfum",
+                notes: "Salida: almendra amarga, azafrán. Corazón: jazmín, cedro. Fondo: ámbar gris, maderas y almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_745961-MLA84421169410_052025-F.webp"
+            },
+{
+                name: "Xerjoff Erba Pura EDP",
+                brand: "Xerjoff",
+                type: "unisex",
+                category: "fresco",
+                concentration: "EDP",
+                notes: "Salida: cítricos italianos (naranja/limón/bergamota). Corazón: frutal. Fondo: almizcle blanco, ámbar y vainilla.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_774858-MLU78336638548_082024-F.webp"
+            },
+{
+                name: "Amber Gold",
+                brand: "Amber Gold",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Perfil ambarado-floral con acorde de ámbar y vainilla apoyado por faceta floral cálida.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_724372-MLA52218878998_102022-F.webp"
+            },
+{
+                name: "Lattafa Qaa'ed EDP",
+                brand: "Lattafa",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: canela, cardamomo, bergamota. Corazón: azafrán, sándalo, cedro, clavel. Fondo: oud, vainilla, cuero y ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_860230-MLU70525033763_072023-F.webp"
+            },
+{
+                name: "Xerjoff Accento EDP",
+                brand: "Xerjoff",
+                type: "unisex",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: piña y jacinto. Corazón: iris, jazmín, pimienta rosa. Fondo: vetiver, vainilla, ámbar y almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_877844-MLA85656224113_062025-F.webp"
+            },
+{
+                name: "Armaf Odyssey Mandarin Sky EDP",
+                brand: "Armaf",
+                type: "unisex",
+                category: "fresco",
+                concentration: "EDP",
+                notes: "Salida: mandarina y pomelo. Corazón: geranio y lavanda. Fondo: vetiver, pachuli y cedro.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_806818-MLM73982503686_012024-F.webp"
+            },
+{
+                name: "Xerjoff 1861 Naxos EDP",
+                brand: "Xerjoff",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: miel, canela y tabaco. Corazón: cítricos (bergamota/limón) y lavanda. Fondo: vainilla y haba tonka.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_728432-MLA91022425117_082025-F.webp"
+            },
+{
+                name: "Arabian Oud – Arabian Prestige Classic",
+                brand: "Arabian Oud",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: vainilla. Corazón: sándalo. Fondo: pachuli y vetiver (amaderado-ambarado).",
+                image: "https://wsrv.nl/?url=https%3A%2F%2Ffimgs.net%2Fmdimg%2Fperfume-thumbs%2F375x500.21602.jpg&output=webp"
+            },
+{
+                name: "Bharara King EDP",
+                brand: "Bharara",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: fresca cítrica-mentolada. Corazón: especiado (canela). Fondo: cuero, maderas, ámbar y pachuli.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_864335-MLA88570371185_072025-F.webp"
+            },
+{
+                name: "Xerjoff Torino21 EDP",
+                brand: "Xerjoff",
+                type: "unisex",
+                category: "fresco",
+                concentration: "EDP",
+                notes: "Salida: menta y limón con tomillo. Corazón: grosella negra y jazmín. Fondo: almizclado ambarado.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_907814-MLA89828159497_082025-F.webp"
+            },
+{
+                name: "Prada L'Homme Intense EDP",
+                brand: "Prada",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDP",
+                notes: "Iris cremoso, ámbar y cuero con pachuli en la base.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_931051-MLC49833945435_052022-F.webp"
+            },
+{
+                name: "Lattafa Badee Al Oud Sublime",
+                brand: "Lattafa",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: lavanda, azafrán, piña. Corazón: floral-ámbar. Fondo: vainilla, madera y oud.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_656006-MLU70919364843_082023-F.webp"
+            },
+{
+                name: "Lattafa Khamrah EDP",
+                brand: "Lattafa",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: canela, nuez moscada y bergamota. Corazón: dátiles, praliné, nardos y mahonial. Fondo: vainilla, mirra, benjuí, ámbar y oud.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_885438-MLA72879950179_112023-F.webp"
+            },
+{
+                name: "Montale Arabians Tonka",
+                brand: "Montale",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: azafrán, bergamota. Corazón: rosa de Bulgaria, oud. Fondo: tonka, ámbar y almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_818165-CBT84562421248_052025-F.webp"
+            },
+{
+                name: "Lattafa Yara Tous",
+                brand: "Lattafa",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: frutal dulce. Corazón: floral cremoso. Fondo: vainilla y almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_631657-MLU75597051920_042024-F.webp"
+            },
+{
+                name: "Lattafa Ayaati Florence EDP",
+                brand: "Lattafa",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: bergamota, mandarina, grosella negra. Corazón: jazmín, rosa de mayo, lirio. Fondo: vainilla, almizcle, maderas blancas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_887272-MLA90531729980_082025-F.webp"
+            },
+{
+                name: "Solid Black EDP",
+                brand: "Solid Black",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDP",
+                notes: "Salida: cítricos frescos. Corazón: especias aromáticas. Fondo: cuero, pachuli y maderas.",
+                image: "https://m.media-amazon.com/images/I/61XqIpKb+dL._AC_SL1500_.jpg"
+            },
+{
+                name: "Al Haramain Amber Oud EDP",
+                brand: "Al Haramain",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: cítricos/aromáticas. Corazón: especiado. Fondo: ámbar, maderas y oud.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_902523-MLU70526803049_072023-F.webp"
+            },
+{
+                name: "Al Haramain Amber Oud Bleu",
+                brand: "Al Haramain",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: limón y pomelo. Corazón: jengibre, pimienta y notas aromáticas. Fondo: maderas, incienso y ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_750085-MLU75478614748_042024-F.webp"
+            },
+{
+                name: "Al Haramain Amber Oud Exclusif Sport",
+                brand: "Al Haramain",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: cítrica-aromática. Corazón: especiado. Fondo: ambarada-amaderada (versión Sport).",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_857393-MLA74726873998_032024-F.webp"
+            },
+{
+                name: "Al Haramain Amber Oud Aqua (Dubai Collection)",
+                brand: "Al Haramain",
+                type: "unisex",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: marinas y cítricas. Corazón: lavanda. Fondo: patchouli, ámbar gris y cedro.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_914774-MLA79678578995_092024-F.webp"
+            },
+{
+                name: "Maison Alhambra Opera Noir (árabe)",
+                brand: "Maison Alhambra",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: especias oscuras, bergamota. Corazón: oud, rosa negra. Fondo: ámbar, almizcle, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_621766-MLA76790126889_062024-F.webp"
+            },
+{
+                name: "Amber Pour Femme EDP (Maison Alhambra / Lattafa)",
+                brand: "Maison Alhambra",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: frutas dulces, bergamota. Corazón: jazmín, rosa, ámbar. Fondo: vainilla, almizcle, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_877783-MLU69392432442_052023-F.webp"
+            },
+{
+                name: "Maison Alhambra Rose Petals EDP",
+                brand: "Maison Alhambra",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: pétalos de rosa, bergamota. Corazón: rosa damascena, peonía. Fondo: almizcle blanco, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_959960-MLU70874595881_082023-F.webp"
+            },
+{
+                name: "Afnan 9PM",
+                brand: "Afnan",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: manzana y canela con lavanda. Corazón: azahar/muguet. Fondo: vainilla, tonka, ámbar y pachuli.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_962207-MLA82995060901_032025-F.webp"
+            },
+{
+                name: "Lattafa Atlas",
+                brand: "Lattafa",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDP",
+                notes: "Salida: notas marinas y sal con limón. Corazón: davana e iris. Fondo: ámbar gris, musgo de roble y sándalo.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_653365-MLU74707104897_022024-F.webp"
+            },
+{
+                name: "Maison Alhambra Hercules",
+                brand: "Maison Alhambra",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDP",
+                notes: "Salida: cítrica especiada (bergamota, pimienta). Corazón: lavanda y especias. Fondo: ambroxan, vainilla y maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_873249-MLA52082768423_102022-F.webp"
+            },
+{
+                name: "Lattafa Asad Bourbon",
+                brand: "Lattafa",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: piña, tabaco, vainilla. Corazón: especias cálidas. Fondo: ámbar, benjuí y maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_756228-MLA82409078906_022025-F.webp"
+            },
+{
+                name: "Armaf Club de Nuit Intense Man EDP",
+                brand: "Armaf",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDP",
+                notes: "Salida: limón, grosella, piña, bergamota. Corazón: rosa, jazmín, abedul. Fondo: almizcle, ámbar gris, pachuli y vainilla.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_636702-MLA82234500095_022025-F.webp"
+            },
+{
+                name: "Dolce & Gabbana Light Blue Men EDT",
+                brand: "Dolce & Gabbana",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: toronja, bergamota, mandarina siciliana. Corazón: romero, palo de rosa. Fondo: incienso, almizcle y musgo de roble.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_678855-MLA85252983522_062025-F.webp"
+            },
+{
+                name: "Azzaro Wanted By Night EDP",
+                brand: "Azzaro",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: canela, mandarina. Corazón: tabaco, incienso. Fondo: cedro rojo, ciprés y cuero.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_963078-MLA48462280070_122021-F.webp"
+            },
+{
+                name: "Tommy Hilfiger Men",
+                brand: "Tommy Hilfiger",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: menta, lavanda, pomelo. Corazón: manzana, canela. Fondo: ámbar y maderas.",
+                image: "https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_859341\-MLA91058897438_092025\-F\.webp\&output=webp"
+            },
+{
+                name: "K by Dolce&Gabbana EDT",
+                brand: "Dolce & Gabbana",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: cítricos y bayas de enebro. Corazón: salvia, geranio, lavanda. Fondo: cedro, vetiver y pachuli.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_653217-MLU73785847928_012024-F.webp"
+            },
+{
+                name: "Azzaro Wanted EDT",
+                brand: "Azzaro",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: limón, jengibre, lavanda. Corazón: cardamomo, enebro. Fondo: tonka, vetiver y ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_763525-MLU75979858665_042024-F.webp"
+            },
+{
+                name: "Tom Ford Ombré Leather EDP",
+                brand: "Tom Ford",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: cardamomo. Corazón: jazmín sambac, cuero. Fondo: ámbar, pachuli, almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_739438-CBT84083879462_052025-F.webp"
+            },
+{
+                name: "Tom Ford Black Orchid EDP",
+                brand: "Tom Ford",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: trufa, ylang-ylang, bergamota. Corazón: orquídea negra, especias, frutas. Fondo: pachuli, vainilla, incienso, sándalo.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_616199-MLA77899943647_072024-F.webp"
+            },
+{
+                name: "Tom Ford Noir de Noir EDP",
+                brand: "Tom Ford",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: bergamota, rosa. Corazón: trufa, oud, pachuli. Fondo: vainilla, sándalo, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_831091-MLU74156705175_012024-F.webp"
+            },
+{
+                name: "Tom Ford Costa Azzurra Parfum",
+                brand: "Tom Ford",
+                type: "unisex",
+                category: "fresco",
+                concentration: "Parfum",
+                notes: "Salida: cítricos mediterráneos, sal marina. Corazón: lavanda, mirto, romero. Fondo: maderas secas, ámbar, almizcle.",
+                image: "https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_618729\-MLA53475652594_012023\-F\.webp\&output=webp"
+            },
+{
+                name: "Tom Ford Neroli Portofino EDP",
+                brand: "Tom Ford",
+                type: "unisex",
+                category: "fresco",
+                concentration: "EDP",
+                notes: "Salida: bergamota, limón, mandarina. Corazón: neroli, flor de azahar, lavanda. Fondo: ámbar, angelica, mirto.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_897568-CBT73437585277_122023-F.webp"
+            },
+{
+                name: "Montale Wild Aoud EDP",
+                brand: "Montale",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: oud, geranio, bergamota. Corazón: tabaco y maderas. Fondo: ámbar, pachuli y vainilla.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_910683-MLU77995559718_082024-F.webp"
+            },
+{
+                name: "Lattafa Yara",
+                brand: "Lattafa",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: orquídea, heliotropo. Corazón: frutas tropicales, notas gourmand. Fondo: vainilla, sándalo, almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_818429-MLA83859211751_042025-F.webp"
+            },
+{
+                name: "Lattafa Yara Candy",
+                brand: "Lattafa",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: frambuesa, pera, bergamota. Corazón: rosa, peonía, jazmín. Fondo: vainilla, almizcle, caramelo suave.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_929559-MLA80591868886_112024-F.webp"
+            },
+{
+                name: "Lattafa Yara Moi",
+                brand: "Lattafa",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: jazmín, durazno. Corazón: caramelo, ámbar. Fondo: pachulí, vainilla, almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_640261-MLU75151471585_032024-F.webp"
+            },
+{
+                name: "Lattafa Asad",
+                brand: "Lattafa",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: piña, tabaco negro, pimienta negra. Corazón: vainilla, pachulí, café, iris. Fondo: ámbar, benjuí, ládano, madera seca.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_704992-MLA83637592590_042025-F.webp"
+            },
+{
+                name: "Ameerat Al Arab Assad EDP (Lattafa)",
+                brand: "Lattafa",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: especias árabes, bergamota. Corazón: oud, rosa. Fondo: ámbar, almizcle, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_950865-MLA89658063117_082025-F.webp"
+            },
+{
+                name: "Ameerat Al Arab Rose (Lattafa)",
+                brand: "Lattafa",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: rosa búlgara, bergamota. Corazón: jazmín, peonía, rosa damascena. Fondo: almizcle blanco, ámbar, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_706313-MLA84280706404_052025-F.webp"
+            },
+{
+                name: "Lattafa Opulent Musk",
+                brand: "Lattafa",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: azafrán, limón. Corazón: jazmín, almizcle blanco. Fondo: ámbar, resinas, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_761849-MLU73783853780_012024-F.webp"
+            },
+{
+                name: "Lattafa Teriaq EDP",
+                brand: "Lattafa",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: especias, bergamota. Corazón: oud, rosa. Fondo: ámbar, almizcle, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_748344-MLA82267910295_022025-F.webp"
+            },
+{
+                name: "Lattafa Sakeena EDP",
+                brand: "Lattafa",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: frutas dulces, bergamota. Corazón: jazmín, rosa, peonía. Fondo: vainilla, almizcle, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_636072-MLU74337621717_022024-F.webp"
+            },
+{
+                name: "Lattafa Éclaire EDP Mujer",
+                brand: "Lattafa",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: bergamota, pera, grosella negra. Corazón: jazmín, rosa, iris. Fondo: vainilla, almizcle blanco, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_854522-MLU76885472895_062024-F.webp"
+            },
+{
+                name: "Antonio Banderas Seduction In Black EDT",
+                brand: "Antonio Banderas",
+                type: "hombre",
+                category: "amaderado",
+                concentration: "EDT",
+                notes: "Salida: bergamota, grosella. Corazón: nuez moscada, cardamomo. Fondo: ámbar, almizcle y maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_787874-MLU72833562547_112023-F.webp"
+            },
+{
+                name: "Antonio Banderas Blue Seduction EDT",
+                brand: "Antonio Banderas",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: melón, bergamota, menta. Corazón: manzana verde, cardamomo. Fondo: ámbar, almizcle y notas marinas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_727151-MLA76686175507_052024-F.webp"
+            },
+{
+                name: "Burberry Varon EDT",
+                brand: "Burberry",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: lavanda, menta. Corazón: tomillo, madera. Fondo: ámbar, musgo de roble y sándalo.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_608439-MLA52422205755_112022-F.webp"
+            },
+{
+                name: "Antonio Banderas King Of Seduction EDT",
+                brand: "Antonio Banderas",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: pomelo, bergamota, piña. Corazón: jazmín, cardamomo. Fondo: ámbar, pachuli, vetiver.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_638922-MLA84850896989_052025-F.webp"
+            },
+{
+                name: "Antonio Banderas The Icon",
+                brand: "Antonio Banderas",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: pomelo, pimienta negra. Corazón: salvia, lavanda, incienso. Fondo: musgo, pachuli y ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_743720-MLA80677328776_112024-F.webp"
+            },
+{
+                name: "Antonio Banderas The Secret Absolu Men",
+                brand: "Antonio Banderas",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: pomelo y menta. Corazón: cardamomo y nuez moscada. Fondo: cuero, haba tonka y almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_698083-MLU77917288583_072024-F.webp"
+            },
+{
+                name: "Jean Paul Gaultier Scandal Pour Homme EDT",
+                brand: "Jean Paul Gaultier",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: salvia, mandarina. Corazón: haba tonka, caramelo. Fondo: vetiver.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_801075-MLA81448981319_122024-F.webp"
+            },
+{
+                name: "Hugo Boss In Motion EDT",
+                brand: "Hugo Boss",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: bergamota, albahaca. Corazón: canela, pimienta rosa, cardamomo. Fondo: almizcle, sándalo y vetiver.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_834382-MLA85466118679_052025-F.webp"
+            },
+{
+                name: "Gucci Guilty Pour Homme EDP",
+                brand: "Gucci",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDP",
+                notes: "Salida: limón, lavanda. Corazón: azahar, pachuli. Fondo: cedro, vainilla.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_616916-MLU74341489569_022024-F.webp"
+            },
+{
+                name: "Louis Vuitton Ombre Nomade",
+                brand: "Louis Vuitton",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: oud. Corazón: rosa de Bulgaria. Fondo: frambuesa, ámbar gris, benjuí e incienso.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_935479-MLU74218958182_012024-F.webp"
+            },
+{
+                name: "Boss Bottled Night EDT",
+                brand: "Hugo Boss",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: lavanda, abedul. Corazón: cardamomo, violeta. Fondo: almizcle, madera de laurel.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_834123-MLA45825594570_052021-F.webp"
+            },
+{
+                name: "Mito Man Ona Saez EDT",
+                brand: "Ona Saez",
+                type: "hombre",
+                category: "amaderado",
+                concentration: "EDT",
+                notes: "Salida: cítricos frescos. Corazón: especias. Fondo: maderas ambaradas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_620686-MLU69293235953_052023-F.webp"
+            },
+{
+                name: "Paco Rabanne One Million Lucky EDT",
+                brand: "Paco Rabanne",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: ciruela, toronja. Corazón: avellana, miel, jazmín. Fondo: cedro, pachuli, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_839865-MLU72559630116_112023-F.webp"
+            },
+{
+                name: "Carolina Herrera Bad Boy Elixir",
+                brand: "Carolina Herrera",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: pomelo, cannabis. Corazón: vetiver, jengibre. Fondo: haba tonka, cuero, incienso.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_722464-MLA85407232216_062025-F.webp"
+            },
+{
+                name: "Paco Rabanne Black XS L'Aphrodisiaque",
+                brand: "Paco Rabanne",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: canela, cacao, ámbar. Corazón: pachuli, cuero, vainilla.",
+                image: "https://http2.mlstatic.com/D_Q_NP_759937-MLA74651556804_022024-O.webp"
+            },
+{
+                name: "Paco Rabanne One Million EDT",
+                brand: "Paco Rabanne",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: mandarina, menta, pomelo. Corazón: canela, rosa, especias. Fondo: cuero, ámbar y pachuli.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_643002-MLA91376040121_082025-F.webp"
+            },
+{
+                name: "Carolina Herrera Bad Boy Cobalt EDP",
+                brand: "Carolina Herrera",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDP",
+                notes: "Salida: pimienta rosa, lavanda. Corazón: ciruela negra, geranio. Fondo: trufa, cedro, vetiver.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_852629-MLU75174665332_032024-F.webp"
+            },
+{
+                name: "Paco Rabanne Phantom EDT",
+                brand: "Paco Rabanne",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: limón, lavanda. Corazón: vainilla, lavanda ahumada. Fondo: vetiver, pachuli.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_916233-MLA84214377976_052025-F.webp"
+            },
+{
+                name: "Paco Rabanne Pure XS EDT",
+                brand: "Paco Rabanne",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: jengibre, bergamota. Corazón: mirra, vainilla. Fondo: azúcar, canela.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_843562-MLA47600407964_092021-F.webp"
+            },
+{
+                name: "Paco Rabanne Invictus Legend EDP",
+                brand: "Paco Rabanne",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDP",
+                notes: "Salida: toronja, sal marina. Corazón: geranio, especias. Fondo: ámbar rojo, guayaco.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_820303-MLU72754610134_112023-F.webp"
+            },
+{
+                name: "Paco Rabanne Invictus EDT",
+                brand: "Paco Rabanne",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: toronja, mandarina. Corazón: hoja de laurel, jazmín. Fondo: ámbar gris, pachuli, musgo.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_604122-MLA47526882006_092021-F.webp"
+            },
+{
+                name: "Paco Rabanne Black XS EDT",
+                brand: "Paco Rabanne",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: limón, salvia. Corazón: cardamomo, praline. Fondo: pachuli, ámbar, ébano.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_959211-MLU75150936854_032024-F.webp"
+            },
+{
+                name: "Paco Rabanne Invictus Platinum EDP",
+                brand: "Paco Rabanne",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDP",
+                notes: "Salida: toronja, absenta. Corazón: lavanda, menta. Fondo: pachuli, ciprés.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_776665-MLU75125765955_032024-F.webp"
+            },
+{
+                name: "Paco Rabanne Invictus Onyx",
+                brand: "Paco Rabanne",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: toronja, notas marinas. Corazón: jazmín, hoja de laurel. Fondo: ámbar gris, pachuli.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_760290-MLA47463054614_092021-F.webp"
+            },
+{
+                name: "Calvin Klein One EDT",
+                brand: "Calvin Klein",
+                type: "unisex",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: piña, papaya, bergamota. Corazón: té verde, jazmín, rosa. Fondo: almizcle, ámbar, cedro."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_958992-MLA83255240684_042025-F.webp&output=webp"},
+{
+                name: "Ralph Lauren Polo Red EDT",
+                brand: "Ralph Lauren",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: pomelo rojo, arándano, limón. Corazón: azafrán, salvia. Fondo: madera roja, ámbar, café tostado."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_760711-MLA88359416991_072025-F.webp&output=webp"},
+{
+                name: "Ralph Lauren Polo Black EDT",
+                brand: "Ralph Lauren",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: mango helado, mandarina. Corazón: albahaca, esclarea. Fondo: tonka, pachuli, sándalo."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_914810-MLA87423317719_072025-F.webp&output=webp"},
+{
+                name: "Calvin Klein Be EDT",
+                brand: "Calvin Klein",
+                type: "unisex",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: lavanda, menta, bergamota. Corazón: jazmín, orquídea. Fondo: almizcle, ámbar, vainilla."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_916111-MLA45187483695_032021-F.webp&output=webp"},
+{
+                name: "Calvin Klein Eternity Eau de Parfum Intense",
+                brand: "Calvin Klein",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: bergamota, mandarina. Corazón: jazmín, rosa. Fondo: almizcle, ámbar, sándalo.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_669600-CBT81486685581_122024-F.webp"
+            },
+{
+                name: "Guess Seductive Noir EDT",
+                brand: "Guess",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: grosella negra, bergamota. Corazón: jazmín, orquídea. Fondo: vainilla, almizcle, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_718262-CBT81369476521_122024-F.webp"
+            },
+{
+                name: "Guerlain Aqua Allegoria Pera Granita EDT",
+                brand: "Guerlain",
+                type: "mujer",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: pera, bergamota. Corazón: jazmín, rosa. Fondo: almizcle blanco, cedro.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_847264-MLA53166830590_012023-F.webp"
+            },
+{
+                name: "Guerlain Aqua Allegoria Nerolia Vetiver EDT",
+                brand: "Guerlain",
+                type: "unisex",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: neroli, bergamota. Corazón: vetiver, té verde. Fondo: almizcle blanco, cedro.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_860210-CBT76206561989_052024-F.webp"
+            },
+{
+                name: "Shakira Love Rock! EDT",
+                brand: "Shakira",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: frutas rojas, bergamota. Corazón: jazmín, rosa. Fondo: vainilla, almizcle, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_900708-MLA32229411579_092019-F.webp"
+            },
+{
+                name: "Adolfo Domínguez Fresia Solar EDP",
+                brand: "Adolfo Domínguez",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: fresia, bergamota. Corazón: jazmín, rosa solar. Fondo: almizcle blanco, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_677119-MLA82869676112_032025-F.webp"
+            },
+{
+                name: "Versace Eros Pour Femme EDP",
+                brand: "Versace",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: limón siciliano, granada. Corazón: jazmín sambac, peonía. Fondo: almizcle, sándalo, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_904423-MLU72633599697_112023-F.webp"
+            },
+{
+                name: "Ralph Lauren Polo EDT Verde",
+                brand: "Ralph Lauren",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: enebro, albahaca, comino. Corazón: cuero, tabaco, musgo de roble."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_631606-MLA84851357637_052025-F.webp&output=webp"},
+{
+                name: "Ralph Lauren Polo Blue Sport Cologne",
+                brand: "Ralph Lauren",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: manzana, menta, mandarina. Corazón: jengibre, salvia, musgo. Fondo: almizcle, maderas."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_916253-MLA50596723245_072022-F.webp&output=webp"},
+{
+                name: "Jean Paul Gaultier Le Beau Paradise Garden EDP",
+                brand: "Jean Paul Gaultier",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: jengibre, coco, iris. Corazón: haba tonka, sándalo, madera de cachemira."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_995211-MLA74084617926_012024-F.webp&output=webp"},
+{
+                name: "Jean Paul Gaultier Le Male Elixir EDP",
+                brand: "Jean Paul Gaultier",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: lavanda, menta, vainilla. Corazón: benjuí, miel, tonka."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_619935-MLA88012647084_072025-F.webp&output=webp"},
+{
+                name: "Jean Paul Gaultier Ultra Male EDT",
+                brand: "Jean Paul Gaultier",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: pera, menta, limón. Corazón: canela, esclarea. Fondo: ámbar, vainilla, cedro."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_602113-CBT84002122001_042025-F.webp&output=webp"},
+{
+                name: "Jean Paul Gaultier Le Beau Le Parfum Intense",
+                brand: "Jean Paul Gaultier",
+                type: "hombre",
+                category: "oriental",
+                concentration: "Parfum",
+                notes: "Salida: piña, coco. Corazón: haba tonka, ámbar. Fondo: maderas dulces."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_790143-MLA70673937702_072023-F.webp&output=webp"},
+{
+                name: "Jean Paul Gaultier Le Beau EDT",
+                brand: "Jean Paul Gaultier",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: bergamota, coco. Corazón: haba tonka."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_610005-MLA48455028426_122021-F.webp&output=webp"},
+{
+                name: "Jean Paul Gaultier Le Male EDT",
+                brand: "Jean Paul Gaultier",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: lavanda, menta, cardamomo. Corazón: canela, flor de azahar. Fondo: tonka, vainilla, cedro."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_896419-MLU73836909302_012024-F.webp&output=webp"},
+{
+                name: "Jean Paul Gaultier Divine EDP (Divino)",
+                brand: "Jean Paul Gaultier",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: bergamota, limón. Corazón: jazmín, rosa divina. Fondo: almizcle blanco, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_950335-MLA74992007900_032024-F.webp"
+            },
+{
+                name: "Jean Paul Gaultier Scandal Absolu Him EDP",
+                brand: "Jean Paul Gaultier",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: bergamota, cardamomo. Corazón: lavanda, vainilla. Fondo: haba tonka, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_800645-MLU76093263108_052024-F.webp"
+            },
+{
+                name: "Valentino Uomo 2021 EDT",
+                brand: "Valentino",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: mandarina, bergamota. Corazón: salvia, lavanda. Fondo: vetiver, iris, vainilla."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_984860-MLU75151658839_032024-F.webp&output=webp"},
+{
+                name: "Dior Sauvage Elixir",
+                brand: "Dior",
+                type: "hombre",
+                category: "oriental",
+                concentration: "Parfum",
+                notes: "Notas principales: canela, nuez moscada, cardamomo, lavanda, regaliz, sándalo, pachulí, ámbar y maderas oscuras."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_992312-MLC50745558879_072022-F.webp&output=webp"},
+{
+                name: "Emporio Armani Stronger With You EDT",
+                brand: "Emporio Armani",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Notas principales: castaña, cardamomo, pimienta rosa, violeta, salvia, melón, piña, vainilla, ámbar y maderas."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_768183-MLA48255767649_112021-F.webp&output=webp"},
+{
+                name: "Valentino Uomo Born in Roma Intense EDP",
+                brand: "Valentino",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Notas principales: vainilla, lavanda, vetiver, especias cálidas y maderas orientales."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_976103-MLU74223979876_022024-F.webp&output=webp"},
+{
+                name: "Armani Stronger With You Absolutely Parfum EDP",
+                brand: "Giorgio Armani",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Notas principales: ron, resinas balsámicas, castaña glaseada, vainilla, lavanda y maderas ámbar."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_944712-MLU75682967739_042024-F.webp&output=webp"},
+{
+                name: "Dior Sauvage Eau de Toilette",
+                brand: "Dior",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Notas principales: bergamota de Calabria, pimienta, lavanda, pimienta rosa, pachulí, cedro y ambroxan."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_718105-MLA70483481903_072023-F.webp&output=webp"},
+{
+                name: "Carolina Herrera CH Men EDT",
+                brand: "Carolina Herrera",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Notas principales: cuero, madera de cachemira, gamuza, pimienta, hierbas verdes, musgo y azúcar glass."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_893937-MLU71078622601_082023-F.webp&output=webp"},
+{
+                name: "Carolina Herrera 212 VIP Men EDT",
+                brand: "Carolina Herrera",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Notas principales: lima, caviar, jengibre, menta congelada, vodka, especias, ámbar, cuero y maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_969997-MLA87487150827_072025-F.webp"
+            },
+{
+                name: "Carolina Herrera 212 Men Sexy",
+                brand: "Carolina Herrera",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Notas principales: mandarina, bergamota, cardamomo, pimienta rosa, flor de gardenia, vainilla, sándalo y almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_981716-MLU73068521397_112023-F.webp"
+            },
+{
+                name: "Carolina Herrera 212 Men NYC",
+                brand: "Carolina Herrera",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Notas principales: hojas verdes, especias, lavanda, pomelo, jengibre, gardenia, sándalo, incienso, almizcle y madera de gaiac.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_914811-MLA72881616069_112023-F.webp"
+            },
+{
+                name: "Carolina Herrera 212 VIP Black Eau de Parfum",
+                brand: "Carolina Herrera",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDP",
+                notes: "Notas principales: absenta, anís estrellado, hinojo, lavanda, almizcle negro y vainilla.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_825260-MLA90435914139_082025-F.webp"
+            },
+{
+                name: "Carolina Herrera 212 Heroes Forever Young EDT",
+                brand: "Carolina Herrera",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Notas principales: pera, jengibre, limón, geranio, lavanda, almizcle y cuero.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_634151-MLA50952802139_082022-F.webp"
+            },
+{
+                name: "Carolina Herrera 212 VIP Mujer EDP",
+                brand: "Carolina Herrera",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: ron, lima. Corazón: gardenia, musk. Fondo: vainilla, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_624214-MLA87118618230_072025-F.webp"
+            },
+{
+                name: "Carolina Herrera 212 VIP Rosé EDP",
+                brand: "Carolina Herrera",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: champagne rosé, durazno. Corazón: rosa reina, peonía. Fondo: almizcle blanco, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_761500-MLA52388446117_112022-F.webp"
+            },
+{
+                name: "Carolina Herrera (by Carolina Herrera) EDP clásico",
+                brand: "Carolina Herrera",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: bergamota, limón. Corazón: jazmín, rosa, tuberosa. Fondo: sándalo, almizcle, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_933282-MLA90643677241_082025-F.webp"
+            },
+{
+                name: "Carolina Herrera 212 Sexy Mujer EDP",
+                brand: "Carolina Herrera",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: mandarina, bergamota. Corazón: gardenia, vainilla. Fondo: sándalo, almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_768797-MLU74929102431_032024-F.webp"
+            },
+{
+                name: "Carolina Herrera 212 EDT (Mujer, original 1997)",
+                brand: "Carolina Herrera",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: bergamota, mandarina. Corazón: gardenia, rosa, jazmín. Fondo: sándalo, almizcle, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_882292-MLU75591093924_042024-F.webp"
+            },
+{
+                name: "Carolina Herrera 212 Heroes For Her EDP",
+                brand: "Carolina Herrera",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: pera, jengibre. Corazón: rosa, jazmín. Fondo: almizcle, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_876114-MLU72631455509_112023-F.webp"
+            },
+{
+                name: "Versace Eros EDT",
+                brand: "Versace",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: menta, manzana verde, limón. Corazón: haba tonka, geranio, ambroxan. Fondo: cedro de Virginia, vetiver, pachuli, vainilla."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_722159-MLA46088855555_052021-F.webp&output=webp"},
+{
+                name: "Versace Dylan Blue EDT",
+                brand: "Versace",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: bergamota, pomelo, higo. Corazón: violeta, papiro, pimienta negra. Fondo: incienso, almizcle, tonka.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_606364-MLA89551235651_082025-F.webp"
+            },
+{
+                name: "Chanel Bleu de Chanel EDT",
+                brand: "Chanel",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: pomelo, limón, menta. Corazón: jengibre, nuez moscada, jazmín. Fondo: incienso, cedro, sándalo.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_860744-MLA45188141093_032021-F.webp"
+            },
+{
+                name: "Chanel Allure Homme Sport EDT",
+                brand: "Chanel",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: mandarina, naranja, notas marinas. Corazón: pimienta, neroli, cedro. Fondo: vainilla, tonka, almizcle blanco.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_997349-MLA45188528091_032021-F.webp"
+            },
+{
+                name: "Giorgio Armani Code EDT",
+                brand: "Giorgio Armani",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: bergamota, limón. Corazón: anís estrellado, oliva. Fondo: cuero, tabaco, haba tonka.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_752654-MLU75230593274_032024-F.webp"
+            },
+{
+                name: "Issey Miyake L'Eau d'Issey Pour Homme EDT",
+                brand: "Issey Miyake",
+                type: "hombre",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: cítricos, ciprés, calone. Corazón: nuez moscada, lirio, canela. Fondo: sándalo, cedro, almizcle, ámber, tabaco.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_704633-MLA85953514699_062025-F.webp"
+            },
+{
+                name: "Davidoff Cool Water Woman EDT",
+                brand: "Davidoff",
+                type: "mujer",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: cítricos, notas acuáticas. Corazón: lirio, rosa, jazmín. Fondo: almizcle, sándalo, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_930508-MLA45254206585_032021-F.webp"
+            },
+{
+                name: "Givenchy Gentleman EDT",
+                brand: "Givenchy",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDT",
+                notes: "Salida: pera, cardamomo, bergamota. Corazón: lavanda, geranio, iris. Fondo: cuero, pachuli, vainilla."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_709829-MLU72558416722_112023-F.webp&output=webp"},
+{
+                name: "Cacharel Amor Pour Homme EDT",
+                brand: "Cacharel",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: melón, mandarina. Corazón: jazmín, lirio. Fondo: vainilla, almizcle blanco, ámbar."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_672305-MLA79592463379_092024-F.webp&output=webp"},
+{
+                name: "Cacharel Amor Amor EDT",
+                brand: "Cacharel",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: grosella negra, naranja, casia. Corazón: jazmín, lirio, rosa. Fondo: vainilla, almizcle, ámbar, tonka.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_672305-MLA79592463379_092024-F.webp"
+            },
+{
+                name: "Giorgio Armani My Way EDP",
+                brand: "Giorgio Armani",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: bergamota, flor de azahar. Corazón: tuberosa, jazmín. Fondo: vainilla, almizcle blanco, cedro.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_908947-MLU72612989597_112023-F.webp"
+            },
+{
+                name: "Giorgio Armani My Way Intense EDP",
+                brand: "Giorgio Armani",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: bergamota, mandarina. Corazón: tuberosa, jazmín sambac. Fondo: vainilla bourbon, almizcle blanco, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_874784-MLA84514268443_052025-F.webp"
+            },
+{
+                name: "Mugler Angel Nova EDP",
+                brand: "Mugler",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: frambuesa, lichi. Corazón: peonía, rosa damascena. Fondo: almizcle blanco, maderas blancas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_902413-MLA90735684160_082025-F.webp"
+            },
+{
+                name: "Antonio Banderas The Icon Women EDT",
+                brand: "Antonio Banderas",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: cítricos, frutas. Corazón: flores blancas, rosa. Fondo: almizcle, maderas, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_819808-MLA69292368046_052023-F.webp"
+            },
+{
+                name: "Antonio Banderas Her Secret Temptation EDP",
+                brand: "Antonio Banderas",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: frutas rojas, bergamota. Corazón: jazmín, rosa, vainilla. Fondo: almizcle, ámbar, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_834858-MLA79794496647_102024-F.webp"
+            },
+{
+                name: "Benetton Colors Woman Rose Intenso EDP",
+                brand: "Benetton",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: rosa, bergamota. Corazón: peonía, jazmín. Fondo: almizcle, ámbar, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_923750-MLA84542461286_052025-F.webp"
+            },
+{
+                name: "Yves Saint Laurent Opium EDP",
+                brand: "Yves Saint Laurent",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: mandarina, bergamota, aldehídos. Corazón: jazmín, rosa, lirio, clavel. Fondo: opoponax, mirra, ámbar, vainilla.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_671971-CBT79228472697_092024-F.webp"
+            },
+{
+                name: "Yves Saint Laurent Libre EDP",
+                brand: "Yves Saint Laurent",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: mandarina, grosella negra, lavanda. Corazón: jazmín, flor de azahar, orquídea. Fondo: vainilla, almizcle, ámbar gris.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_717350-MLA81525936160_012025-F.webp"
+            },
+{
+                name: "Givenchy Very Irresistible EDP",
+                brand: "Givenchy",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: anís estrellado, rosa. Corazón: peonía, verbena. Fondo: vainilla, almizcle blanco.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_638369-MLU54984879266_052023-F.webp"
+            },
+{
+                name: "Givenchy Ange ou Démon Le Secret EDP",
+                brand: "Givenchy",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: té, cranberry. Corazón: peonía, jazmín. Fondo: almizcle, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_999651-MLA84483794355_052025-F.webp"
+            },
+{
+                name: "Givenchy Irresistible Very Floral EDP",
+                brand: "Givenchy",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: rosa, bergamota. Corazón: peonía, jazmín. Fondo: almizcle blanco, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_988291-MLU77872299306_072024-F.webp"
+            },
+{
+                name: "Givenchy L'Interdit Rouge EDP",
+                brand: "Givenchy",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: pimienta roja, jengibre. Corazón: jazmín sambac, tuberosa. Fondo: pachuli, vainilla.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_927818-MLM50938776434_072022-F.webp"
+            },
+{
+                name: "Givenchy Ange ou Démon EDP",
+                brand: "Givenchy",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: mandarina, azafrán. Corazón: lirio, orquídea. Fondo: tonka, vainilla, ébano.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_974484-MLU70020662893_062023-F.webp"
+            },
+{
+                name: "Givenchy Amarige EDT",
+                brand: "Givenchy",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: frutas, cítricos. Corazón: gardenia, jazmín, ylang-ylang. Fondo: ámbar, almizcle, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_733673-CBT74356026070_022024-F.webp"
+            },
+{
+                name: "Ariana Grande Thank U, Next EDP",
+                brand: "Ariana Grande",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: pera, frambuesa rosa. Corazón: rosa, coco. Fondo: almizcle, sándalo, macaron.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_717003-MLM45771804609_042021-F.webp"
+            },
+{
+                name: "Boss The Scent Intense for Her EDP (Mujer)",
+                brand: "Hugo Boss",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: durazno, jengibre. Corazón: osmanthus, freesia. Fondo: vainilla, cacao, almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_877155-MLA50773185541_072022-F.webp"
+            },
+{
+                name: "Jimmy Choo I Want Choo Forever EDP",
+                brand: "Jimmy Choo",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: mandarina roja, durazno. Corazón: jazmín sambac, heliotropo. Fondo: vainilla, almizcle, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_959070-MLA74676487400_022024-F.webp"
+            },
+{
+                name: "Ariana Grande Cloud EDP",
+                brand: "Ariana Grande",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: pera, bergamota, lavanda. Corazón: coco, praliné, vainilla orquídea. Fondo: almizcle, maderas cremosas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_726719-MLU72836480957_112023-F.webp"
+            },
+{
+                name: "Paris Hilton Heiress EDP",
+                brand: "Paris Hilton",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: durazno, cereza, pasión. Corazón: madreselva, jazmín, tiare. Fondo: vainilla, ylang-ylang, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_907587-MLU70303404499_072023-F.webp"
+            },
+{
+                name: "Britney Spears Fantasy EDP",
+                brand: "Britney Spears",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: lichi, kiwi dorado, cupcake. Corazón: jazmín, chocolate blanco, orquídea. Fondo: almizcle, orris, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_828301-MLU74136917074_012024-F.webp"
+            },
+{
+                name: "Britney Spears Believe EDP",
+                brand: "Britney Spears",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: guayaba, tangerina. Corazón: linden blossom, honeysuckle. Fondo: ámbar, pachuli, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_764202-MLU78401085772_082024-F.webp"
+            },
+{
+                name: "Paco Rabanne Olympea EDP",
+                brand: "Paco Rabanne",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: mandarina verde, jengibre, agua. Corazón: jazmín, vainilla. Fondo: sándalo, cachemira, ámbar gris.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_601491-MLU72678047439_112023-F.webp"
+            },
+{
+                name: "Paco Rabanne Lady Million EDP",
+                brand: "Paco Rabanne",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: neroli, frambuesa. Corazón: jazmín, gardenia, flor de azahar. Fondo: miel, pachuli, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_632637-MLU74074036200_012024-F.webp"
+            },
+{
+                name: "Paco Rabanne Lady Million Privé EDP",
+                brand: "Paco Rabanne",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: frambuesa, cacao. Corazón: rosa, jazmín. Fondo: vainilla, pachuli, miel.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_975285-MLU54977597967_042023-F.webp"
+            },
+{
+                name: "Paco Rabanne Fame The Couture EDP",
+                brand: "Paco Rabanne",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: bergamota, mandarina. Corazón: jazmín, incienso. Fondo: vainilla, almizcle, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_790240-MLA82771574721_022025-F.webp"
+            },
+{
+                name: "Paco Rabanne Pure XS For Her EDP",
+                brand: "Paco Rabanne",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: ylang-ylang, bergamota. Corazón: jazmín, vainilla orquídea. Fondo: sándalo, almizcle, cacao.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_684712-MLA50527194715_062022-F.webp"
+            },
+{
+                name: "Paco Rabanne Lady Million Lucky EDP",
+                brand: "Paco Rabanne",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: frambuesa, lichi. Corazón: jazmín, rosa. Fondo: vainilla, almizcle, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_712594-MLU73884824975_012024-F.webp"
+            },
+{
+                name: "Paco Rabanne Fame Eau de Parfum",
+                brand: "Paco Rabanne",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: bergamota, mandarina. Corazón: jazmín, incienso. Fondo: vainilla, almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_985024-MLA51801024240_102022-F.webp"
+            },
+{
+                name: "Paco Rabanne Black XS For Her EDP",
+                brand: "Paco Rabanne",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: arándano, cacao, tamarindo. Corazón: rosa, violeta, heliotrop. Fondo: vainilla, pachuli, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_755181-MLA52222745632_102022-F.webp"
+            },
+{
+                name: "Tommy Hilfiger Tommy Girl EDT",
+                brand: "Tommy Hilfiger",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: manzana, grosella negra, mandarina. Corazón: violeta, rosa, jazmín. Fondo: cedro, sándalo, almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_795369-MLU73613257046_122023-F.webp"
+            },
+{
+                name: "Burberry Her EDP",
+                brand: "Burberry",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: grosella negra, frambuesa, mora. Corazón: violeta, jazmín. Fondo: almizcle, ámbar, vainilla.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_720040-MLU72831496353_112023-F.webp"
+            },
+{
+                name: "Lancôme La Nuit Trésor Intense EDP",
+                brand: "Lancôme",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: pera, bergamota. Corazón: jazmín sambac, rosa. Fondo: vainilla, pachuli, café.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_640319-MLA50708874362_072022-F.webp"
+            },
+{
+                name: "Lancôme La Nuit Trésor EDP",
+                brand: "Lancôme",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: pera, bergamota. Corazón: jazmín sambac, rosa. Fondo: vainilla, pachuli, café.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_754667-MLA83145339412_032025-F.webp"
+            },
+{
+                name: "Lancôme Trésor L'Eau de Parfum EDP",
+                brand: "Lancôme",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: rosa, lirio, albaricoque, piña. Corazón: iris, jazmín, heliotropo. Fondo: sándalo, ámbar, almizcle, vainilla.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_808622-MLA87177317474_072025-F.webp"
+            },
+{
+                name: "Lancôme La Nuit Trésor À La Folie EDP",
+                brand: "Lancôme",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: cereza, bergamota. Corazón: jazmín sambac, rosa. Fondo: vainilla, pachuli, café.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_778090-MLA31596521587_072019-F.webp"
+            },
+{
+                name: "Thierry Mugler Alien EDP",
+                brand: "Thierry Mugler",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: jazmín sambac. Corazón: madera de cachemira. Fondo: ámbar gris.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_732981-MLA47599703520_092021-F.webp"
+            },
+{
+                name: "Lancôme Idôle L'Intense EDP",
+                brand: "Lancôme",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: pera, bergamota. Corazón: rosa, jazmín sambac. Fondo: vainilla, pachuli, cedro.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_946535-MLA86425592180_062025-F.webp"
+            },
+{
+                name: "Kenzo Homme EDT",
+                brand: "Kenzo",
+                type: "hombre",
+                category: "amaderado",
+                concentration: "EDT",
+                notes: "Salida: limón, bergamota. Corazón: pimienta, nuez moscada. Fondo: sándalo, cedro."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_636157-MLA73172939447_112023-F.webp&output=webp"},
+{
+                name: "Dior J'adore EDP",
+                brand: "Dior",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: pera, melón, magnolia, durazno, mandarina, bergamota. Corazón: jazmín, lirio, orquídea, freesia, rosa, violeta, ciruela. Fondo: almizcle, vainilla, cedro, mirra.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_746902-MLA90055204238_082025-F.webp"
+            },
+{
+                name: "Lancôme La Vie Est Belle EDP",
+                brand: "Lancôme",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: grosella negra, pera. Corazón: iris, jazmín, azahar. Fondo: praline, vainilla, pachuli, haba tonka.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_765769-MLA88858733471_072025-F.webp"
+            },
+{
+                name: "Lancôme La Vie Est Belle En Rose EDT",
+                brand: "Lancôme",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: grosella negra, pera. Corazón: iris, rosa, jazmín. Fondo: praline rosado, vainilla, pachuli.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_952586-MLA72920869832_112023-F.webp"
+            },
+{
+                name: "Viktor & Rolf Flowerbomb EDP",
+                brand: "Viktor & Rolf",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: bergamota, té verde. Corazón: sambac, orquídea, freesia, rosa. Fondo: almizcle, pachuli, vainilla.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_839288-MLU69593669671_052023-F.webp"
+            },
+{
+                name: "Viamo Roma",
+                brand: "Viamo",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: bergamota, limón. Corazón: jazmín, rosa italiana. Fondo: almizcle, maderas, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_789022-MLU74192120045_012024-F.webp"
+            },
+{
+                name: "Yves Saint Laurent Black Opium EDP",
+                brand: "Yves Saint Laurent",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: pera, mandarina rosa, naranja. Corazón: jazmín, café, almendra amarga, regaliz. Fondo: vainilla, pachuli, cedro, cachemira."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_993646-MLU77581308132_072024-F.webp&output=webp"},
+{
+                name: "Dolce & Gabbana Light Blue EDT",
+                brand: "Dolce & Gabbana",
+                type: "mujer",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: limón siciliano, manzana, campanilla. Corazón: bambú, jazmín, rosa blanca. Fondo: cedro, ámbar, almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_884264-MLA45375225808_032021-F.webp"
+            },
+{
+                name: "Dolce & Gabbana Devotion For Men EDP",
+                brand: "Dolce & Gabbana",
+                type: "hombre",
+                category: "aromático",
+                concentration: "EDP",
+                notes: "Salida: bergamota, limón. Corazón: lavanda, geranio. Fondo: vetiver, cedro, almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_815010-MLA83582350263_042025-F.webp"
+            },
+{
+                name: "Dolce & Gabbana Q EDP (Mujer)",
+                brand: "Dolce & Gabbana",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: bergamota, limón. Corazón: jazmín, rosa. Fondo: almizcle blanco, maderas.",
+                image: "https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_660304\-MLU70061864634_062023\-F\.webp\&output=webp"
+            },
+{
+                name: "Dolce & Gabbana L'Impératrice EDT",
+                brand: "Dolce & Gabbana",
+                type: "mujer",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: kiwi, ruibarbo. Corazón: ciclamen, sandía. Fondo: almizcle, maderas, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_968879-MLM48767324495_012022-F.webp"
+            },
+{
+                name: "Carolina Herrera Good Girl EDP",
+                brand: "Carolina Herrera",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: almendra, café. Corazón: jazmín sambac, tuberosa. Fondo: haba tonka, cacao, vainilla, sándalo.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_915732-MLA44816564775_022021-F.webp"
+            },
+{
+                name: "Carolina Herrera Very Good Girl EDP",
+                brand: "Carolina Herrera",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: rosa, bergamota. Corazón: jazmín sambac, tuberosa. Fondo: vainilla, cacao, haba tonka.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_926635-MLA84474500743_052025-F.webp"
+            },
+{
+                name: "Carolina Herrera Good Girl Blush EDP",
+                brand: "Carolina Herrera",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: rosa, bergamota. Corazón: jazmín sambac, tuberosa. Fondo: vainilla, almizcle blanco.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_783404-MLU75330734627_032024-F.webp"
+            },
+{
+                name: "Carolina Herrera Good Girl Dazzling Garden EDP",
+                brand: "Carolina Herrera",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: bergamota, rosa. Corazón: jazmín sambac, tuberosa. Fondo: vainilla, almizcle, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_729801-MLU71531637651_092023-F.webp"
+            },
+{
+                name: "DKNY Be Delicious EDP",
+                brand: "DKNY",
+                type: "mujer",
+                category: "fresco",
+                concentration: "EDP",
+                notes: "Salida: manzana verde, pepino, toronja. Corazón: tuberosa, rosa, violeta. Fondo: sándalo, ámbar, almizcle.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_696344-MLU75570954720_042024-F.webp"
+            },
+{
+                name: "Carolina Herrera CH Insignia EDP",
+                brand: "Carolina Herrera",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: bergamota, mandarina. Corazón: jazmín, rosa, peonía. Fondo: almizcle blanco, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_717440-MLA49119187979_022022-F.webp"
+            },
+{
+                name: "Carolina Herrera CH Sublime EDP",
+                brand: "Carolina Herrera",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: bergamota, pera. Corazón: jazmín, rosa sublime. Fondo: almizcle blanco, vainilla.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_793303-MLA84272318620_052025-F.webp"
+            },
+{
+                name: "Thierry Mugler Angel EDP",
+                brand: "Thierry Mugler",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: algodón de azúcar, coco, jazmín, bergamota, cassis, piña, melón. Corazón: miel, frutos rojos, albaricoque, ciruela, orquídea, lirio, rosa. Fondo: ámbar, pachuli, vainilla, caramelo, chocolate, almizcle."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_697370-MLA46428291640_062021-F.webp&output=webp"},
+{
+                name: "Givenchy L'Interdit EDP",
+                brand: "Givenchy",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: pera, bergamota. Corazón: jazmín sambac, azahar, tuberosa. Fondo: pachuli, vainilla, ámbar gris, vetiver.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_707395-MLA46332570912_062021-F.webp"
+            },
+{
+                name: "Armani Si EDP",
+                brand: "Giorgio Armani",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: grosella negra, mandarina. Corazón: davana, rosa de mayo, freesia, lirio. Fondo: almizcle blanco, ámbar, vainilla, pachuli, maderas blancas."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_700635-MLA52216166349_102022-F.webp&output=webp"},
+{
+                name: "Bulgari Omnia Crystalline EDT",
+                brand: "Bulgari",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: bambú, pera nashi. Corazón: loto, té verde. Fondo: almizcle, maderas, ámbar gris.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_904282-MLU75270491015_032024-F.webp"
+            },
+{
+                name: "Bvlgari Omnia Pink Sapphire EDT",
+                brand: "Bulgari",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: pomelo rosa, frangipanier. Corazón: tiare, rosa. Fondo: almizcle, maderas rosadas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_950080-MLA70941593670_082023-F.webp"
+            },
+{
+                name: "Issey Miyake L'Eau d'Issey Woman EDT",
+                brand: "Issey Miyake",
+                type: "mujer",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: rosa, melón, calone, loto, freesia, ciclamen. Corazón: peonía, lirio, carnation. Fondo: ámbar, almizcle, sándalo, cedro, musgo de roble.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_681880-MLA84479174819_052025-F.webp"
+            },
+{
+                name: "Kenzo Flower EDP",
+                brand: "Kenzo",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: búlgara, cassis, peonía. Corazón: jazmín, rosa, violeta, opoponax. Fondo: vainilla, almizcle blanco, incienso."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_740626-MLU74111652734_012024-F.webp&output=webp"},
+{
+                name: "Nina Ricci Nina EDT",
+                brand: "Nina Ricci",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: limón, lima, manzana. Corazón: peonía, gardenia, manzana. Fondo: almizcle blanco, cedro, manzana.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_840835-MLU75425477211_032024-F.webp"
+            },
+{
+                name: "Nina Ricci Les Sorbets EDT",
+                brand: "Nina Ricci",
+                type: "mujer",
+                category: "fresco",
+                concentration: "EDT",
+                notes: "Salida: limón, bergamota. Corazón: peonía, rosa. Fondo: almizcle blanco, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_969724-MLA70609887292_072023-F.webp"
+            },
+{
+                name: "Nina Ricci Nina Rose EDT",
+                brand: "Nina Ricci",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: limón, bergamota. Corazón: rosa, peonía. Fondo: almizcle blanco, cedro.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_644959-MLU75133485439_032024-F.webp"
+            },
+{
+                name: "Nina Ricci Le Parfum EDP (L'Extase)",
+                brand: "Nina Ricci",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: rosa, bergamota. Corazón: jazmín sambac, hedione. Fondo: almizcle blanco, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_727578-MLU75794408872_042024-F.webp"
+            },
+{
+                name: "Nina Ricci Rouge EDT",
+                brand: "Nina Ricci",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: cereza, frambuesa. Corazón: rosa, peonía. Fondo: almizcle blanco, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_936085-MLU73199741933_122023-F.webp"
+            },
+{
+                name: "Nina Ricci Luna EDP",
+                brand: "Nina Ricci",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: pera, bergamota. Corazón: jazmín, rosa lunar. Fondo: almizcle blanco, vainilla.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_614255-MLA74149771710_012024-F.webp"
+            },
+{
+                name: "Kenzo Flower By Kenzo L'Elixir EDP",
+                brand: "Kenzo",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: rosa búlgara, cassis. Corazón: jazmín, violeta. Fondo: vainilla, almizcle blanco, incienso.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_642171-MLU74129183139_012024-F.webp"
+            },
+{
+                name: "Kenzo Jeu d'Amour Eau de Parfum",
+                brand: "Kenzo",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: pomelo rosa, grosella negra. Corazón: jazmín, peonía. Fondo: almizcle blanco, cedro.",
+                image: "https://wsrv.nl/?url=https%3A%2F%2Ffimgs.net%2Fmdimg%2Fperfume-thumbs%2F375x500.25866.jpg&output=webp"
+            },
+{
+                name: "Kenzo Flower By Kenzo Eau de Parfum",
+                brand: "Kenzo",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: rosa búlgara, cassis, peonía. Corazón: jazmín, rosa, violeta. Fondo: vainilla, almizcle blanco, incienso.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_740626-MLU74111652734_012024-F.webp"
+            },
+{
+                name: "Kenzo Amour Eau de Parfum",
+                brand: "Kenzo",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: cereza, grosella roja. Corazón: jazmín, heliotropo. Fondo: vainilla, almizcle blanco, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_742626-MLU72604816227_102023-F.webp"
+            },
+{
+                name: "Kenzo Madly Eau de Parfum",
+                brand: "Kenzo",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: bergamota, mandarina. Corazón: jazmín, peonía. Fondo: almizcle blanco, cedro.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_712141-MLU69221239041_052023-F.webp"
+            },
+{
+                name: "Moschino Cheap and Chic EDT",
+                brand: "Moschino",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: mandarina, anís, rosa. Corazón: peonía, jazmín, lirio. Fondo: almizcle, ámbar, pachuli."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_740098-MLA47583083753_092021-F.webp&output=webp"},
+{
+                name: "Moschino Fresh Gold Couture EDP",
+                brand: "Moschino",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: ylang-ylang, magnolia. Corazón: rosa, jazmín. Fondo: almizcle dorado, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_751904-MLU72831159305_112023-F.webp"
+            },
+{
+                name: "Moschino Funny! EDT",
+                brand: "Moschino",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDT",
+                notes: "Salida: grosella roja, té verde. Corazón: peonía, jazmín, violeta. Fondo: almizcle blanco, cedro.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_979388-MLA86674352325_062025-F.webp"
+            },
+{
+                name: "Moschino Toy 2 Bubble Gum EDT",
+                brand: "Moschino",
+                type: "mujer",
+                category: "oriental",
+                concentration: "EDT",
+                notes: "Salida: goma de mascar, frutas dulces. Corazón: flores candy, vainilla. Fondo: almizcle dulce, maderas.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_915091-MLA89134468026_082025-F.webp"
+            },
+{
+                name: "Moschino Toy 2 EDP",
+                brand: "Moschino",
+                type: "mujer",
+                category: "floral",
+                concentration: "EDP",
+                notes: "Salida: mandarina, grosella. Corazón: magnolia, jazmín. Fondo: almizcle blanco, ámbar.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_686459-MLA84181853370_052025-F.webp"
+            },
+{
+                name: "Montale Black Aoud EDP",
+                brand: "Montale",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: oud, pachuli. Corazón: rosa, geranio. Fondo: ámbar, vainilla, almizcle."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_863614-MLA90661754693_082025-F.webp&output=webp"},
+{
+                name: "Amber Oud Gold Edition EDP",
+                brand: "Amber Oud",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: azafrán, rosa. Corazón: oud, pachuli. Fondo: ámbar, almizcle, vainilla."
+            , image: "https://wsrv.nl/?url=https%3A%2F%2Fhttp2.mlstatic.com%2FD_NQ_NP_2X_724372-MLA52218878998_102022-F.webp&output=webp"},
+{
+                name: "Lattafa Bade'e Al Oud – Oud for Glory",
+                brand: "Lattafa",
+                type: "unisex",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: rosa, azafrán. Corazón: oud, pachuli. Fondo: ámbar, almizcle, vainilla.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_700054-MLU76894709917_062024-F.webp"
+            },
+{
+                name: "Lattafa Fakhar EDP",
+                brand: "Lattafa",
+                type: "hombre",
+                category: "oriental",
+                concentration: "EDP",
+                notes: "Salida: bergamota, especias. Corazón: maderas, oud. Fondo: ámbar, almizcle, tabaco.",
+                image: "https://http2.mlstatic.com/D_NQ_NP_2X_600470-MLA71892864326_092023-F.webp"
+            },
+{name:"Tommy Hilfiger Men", brand:"Tommy Hilfiger", type:"hombre", category:"aromático", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_859341\-MLA91058897438_092025\-F\.webp\&output=webp"},
+{name:"Tom Ford Costa Azzurra Parfum", brand:"Tom Ford", type:"unisex", category:"fresco", concentration:"Parfum", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_618729\-MLA53475652594_012023\-F\.webp\&output=webp"},
+{name:"Calvin Klein One EDT", brand:"Calvin Klein", type:"unisex", category:"fresco", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_958992\-MLA83255240684_042025\-F\.webp\&output=webp"},
+{name:"Ralph Lauren Polo Red EDT", brand:"Ralph Lauren", type:"hombre", category:"oriental", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_760711\-MLA88359416991_072025\-F\.webp\&output=webp"},
+{name:"Ralph Lauren Polo Black EDT", brand:"Ralph Lauren", type:"hombre", category:"aromático", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_914810\-MLA87423317719_072025\-F\.webp\&output=webp"},
+{name:"Calvin Klein Be EDT", brand:"Calvin Klein", type:"unisex", category:"aromático", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_916111\-MLA45187483695_032021\-F\.webp\&output=webp"},
+{name:"Ralph Lauren Polo EDT Verde", brand:"Ralph Lauren", type:"hombre", category:"aromático", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_631606\-MLA84851357637_052025\-F\.webp\&output=webp"},
+{name:"Ralph Lauren Polo Blue Sport Cologne", brand:"Ralph Lauren", type:"hombre", category:"fresco", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_916253\-MLA50596723245_072022\-F\.webp\&output=webp"},
+{name:"Jean Paul Gaultier Le Beau Paradise Garden EDP", brand:"Jean Paul Gaultier", type:"hombre", category:"oriental", concentration:"EDP", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_995211\-MLA74084617926_012024\-F\.webp\&output=webp"},
+{name:"Jean Paul Gaultier Le Male Elixir EDP", brand:"Jean Paul Gaultier", type:"hombre", category:"oriental", concentration:"EDP", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_619935\-MLA88012647084_072025\-F\.webp\&output=webp"},
+{name:"Jean Paul Gaultier Ultra Male EDT", brand:"Jean Paul Gaultier", type:"hombre", category:"oriental", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_602113\-CBT84002122001_042025\-F\.webp\&output=webp"},
+{name:"Jean Paul Gaultier Le Beau Le Parfum Intense", brand:"Jean Paul Gaultier", type:"hombre", category:"oriental", concentration:"Parfum", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_790143\-MLA70673937702_072023\-F\.webp\&output=webp"},
+{name:"Jean Paul Gaultier Le Beau EDT", brand:"Jean Paul Gaultier", type:"hombre", category:"oriental", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_610005\-MLA48455028426_122021\-F\.webp\&output=webp"},
+{name:"Jean Paul Gaultier Le Male EDT", brand:"Jean Paul Gaultier", type:"hombre", category:"aromático", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_896419\-MLU73836909302_012024\-F\.webp\&output=webp"},
+{name:"Valentino Uomo 2021 EDT", brand:"Valentino", type:"hombre", category:"aromático", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_984860\-MLU75151658839_032024\-F\.webp\&output=webp"},
+{name:"Dior Sauvage Elixir", brand:"Dior", type:"hombre", category:"oriental", concentration:"Parfum", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_992312\-MLC50745558879_072022\-F\.webp\&output=webp"},
+{name:"Emporio Armani Stronger With You EDT", brand:"Armani", type:"hombre", category:"oriental", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_768183\-MLA48255767649_112021\-F\.webp\&output=webp"},
+{name:"Valentino Uomo Born in Roma Intense EDP", brand:"Valentino", type:"hombre", category:"oriental", concentration:"EDP", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_976103\-MLU74223979876_022024\-F\.webp\&output=webp"},
+{name:"Armani Stronger With You Absolutely Parfum EDP", brand:"Armani", type:"hombre", category:"oriental", concentration:"Parfum", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_944712\-MLU75682967739_042024\-F\.webp\&output=webp"},
+{name:"Dior Sauvage Eau de Toilette", brand:"Dior", type:"hombre", category:"aromático", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_718105\-MLA70483481903_072023\-F\.webp\&output=webp"},
+{name:"Carolina Herrera CH Men EDT", brand:"Carolina Herrera", type:"hombre", category:"oriental", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_893937\-MLU71078622601_082023\-F\.webp\&output=webp"},
+{name:"Versace Eros EDT", brand:"Versace", type:"hombre", category:"oriental", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_722159\-MLA46088855555_052021\-F\.webp\&output=webp"},
+{name:"Givenchy Gentleman EDT", brand:"Givenchy", type:"hombre", category:"aromático", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_709829\-MLU72558416722_112023\-F\.webp\&output=webp"},
+{name:"Cacharel Amor Pour Homme EDT", brand:"Cacharel", type:"hombre", category:"aromático", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_672305\-MLA79592463379_092024\-F\.webp\&output=webp"},
+{name:"Kenzo Homme EDT", brand:"Kenzo", type:"hombre", category:"fresco", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_636157\-MLA73172939447_112023\-F\.webp\&output=webp"},
+{name:"Yves Saint Laurent Black Opium EDP", brand:"Yves Saint Laurent", type:"mujer", category:"oriental", concentration:"EDP", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_993646\-MLU77581308132_072024\-F\.webp\&output=webp"},
+{name:"Dolce & Gabbana Q EDP (Mujer)", brand:"Dolce & Gabbana", type:"mujer", category:"floral", concentration:"EDP", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_660304\-MLU70061864634_062023\-F\.webp\&output=webp"},
+{name:"Thierry Mugler Angel EDP", brand:"Thierry Mugler", type:"mujer", category:"oriental", concentration:"EDP", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_697370\-MLA46428291640_062021\-F\.webp\&output=webp"},
+{name:"Armani Si EDP", brand:"Armani", type:"mujer", category:"floral", concentration:"EDP", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_700635\-MLA52216166349_102022\-F\.webp\&output=webp"},
+{name:"Kenzo Flower EDP", brand:"Kenzo", type:"mujer", category:"floral", concentration:"EDP", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_740626\-MLU74111652734_012024\-F\.webp\&output=webp"},
+{name:"Moschino Cheap and Chic EDT", brand:"Moschino", type:"mujer", category:"floral", concentration:"EDT", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_740098\-MLA47583083753_092021\-F\.webp\&output=webp"},
+{name:"Montale Black Aoud EDP", brand:"Montale", type:"unisex", category:"oriental", concentration:"EDP", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_863614\-MLA90661754693_082025\-F\.webp\&output=webp"},
+{name:"Amber Oud Gold Edition EDP", brand:"Al Haramain", type:"unisex", category:"oriental", concentration:"EDP", notes:"", image:"https://wsrv\.nl/\?url=https%3A%2F%2Fhttp2\.mlstatic\.com%2FD_NQ_NP_2X_724372\-MLA52218878998_102022\-F\.webp\&output=webp"}
+];
+
+// ---- utilidades ----
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+const gridEl    = $('#perfumesGrid');
+const counterEl = $('#resultsCounter');
+const noResEl   = $('#noResults');
+const searchEl  = $('#searchInput');
+const chipsEl   = $('#activeFilters');
+
+const state = {
+  gender: null,
+  concentration: null,
+  category: null,
+  brand: null,
+  q: ''
+};
+
+function cap(s){ return (s||'').toString().replace(/^./,c=>c.toUpperCase()); }
+function normalize(s){ return (s||'').toString().toLowerCase()
+  .normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+
+function matchesQuery(p, q){
+  if(!q) return true;
+  const hay = `${p.name||''} ${p.brand||''} ${p.notes||''}`;
+  return normalize(hay).includes(normalize(q));
+}
+
+function cardHTML(p){
+  const img = p.image ? `<img src="${p.image}" alt="${p.name}" referrerpolicy="no-referrer" crossorigin="anonymous" loading="eager" class="w-full h-48 object-cover rounded-t-2xl">` : '';
+  const type = p.type ? `<span class="mr-2 mb-2 inline-block px-3 py-1 rounded-full bg-white/10 border border-white/20">${cap(p.type)}</span>` : '';
+  const cat  = p.category ? `<span class="mr-2 mb-2 inline-block px-3 py-1 rounded-full bg-white/10 border border-white/20">${cap(p.category)}</span>` : '';
+  const conc = p.concentration ? `<span class="inline-block px-2 py-1 rounded-md text-white ${p.concentration==='EDT'?'edt-badge':(p.concentration==='Parfum'?'parfum-badge':'edp-badge')}">${p.concentration}</span>` : '';
+  return `<article class="perfume-card rounded-2xl overflow-hidden relative">
+    ${img}
+    <div class="p-5">
+      <div class="brand-badge">${p.brand||'—'}</div>
+      <h3 class="font-playfair text-xl font-semibold leading-snug mb-2">${p.name}</h3>
+      <div class="flex flex-wrap">${type}${cat}</div>
+      <div class="mt-3 text-sm text-gray-300 line-clamp-3">${p.notes||''}</div>
+      <div class="mt-4">${conc}</div>
+    </div>
+  </article>`;
+}
+
+function render(list){
+  list = Array.isArray(list) ? list : [];
+  gridEl.innerHTML = list.map(cardHTML).join('');
+  const total = list.length;
+  counterEl.textContent = `Mostrando ${total} perfume${total===1?'':'s'}`;
+  noResEl.classList.toggle('hidden', total !== 0);
+}
+
+// AND de todos los filtros + búsqueda
+function applyFilters(){
+  const q = state.q;
+  const out = perfumes.filter(p => {
+    const byGender = !state.gender || normalize(p.type) === normalize(state.gender);
+    const byConc   = !state.concentration || normalize(p.concentration) === normalize(state.concentration);
+    const byCat    = !state.category || normalize(p.category) === normalize(state.category);
+    const byBrand  = !state.brand || normalize(p.brand) === normalize(state.brand);
+    const byQuery  = matchesQuery(p, q);
+    return byGender && byConc && byCat && byBrand && byQuery;
+  });
+  render(out);
+  drawChips();
+  updateActiveButtons();
+}
+
+function drawChips(){
+  const chips = [];
+  const mk = (label, key) => `<button data-key="${key}" class="px-3 py-1 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition">${label} ✕</button>`;
+  if(state.gender) chips.push(mk(cap(state.gender),'gender'));
+  if(state.concentration) chips.push(mk(state.concentration,'concentration'));
+  if(state.category) chips.push(mk(cap(state.category),'category'));
+  if(state.brand) chips.push(mk(state.brand,'brand'));
+  if(state.q) chips.push(mk(`“${state.q}”`,'q'));
+  chipsEl.innerHTML = chips.join('');
+  chipsEl.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const k = b.dataset.key;
+      if(k==='q'){ state.q=''; searchEl.value=''; }
+      else { state[k]=null; }
+      applyFilters();
+    });
+  });
+}
+
+function resetAll(){
+  state.gender = state.concentration = state.category = state.brand = null;
+  state.q = '';
+  if (searchEl) searchEl.value = '';
+  applyFilters();
+}
+
+function updateActiveButtons(){
+  $$('.filter-btn').forEach(btn=>{
+    const t = btn.dataset.type;
+    const v = btn.dataset.filter;
+    btn.classList.remove('active');
+    if(t==='main' && v==='all'){
+      if(!state.gender && !state.concentration && !state.category && !state.brand && !state.q){
+        btn.classList.add('active');
+      }
+      return;
+    }
+    if(state[t] && normalize(state[t]) === normalize(v)){
+      btn.classList.add('active');
+    }
+  });
+}
+
+// listeners
+if(searchEl){
+  let to; 
+  searchEl.addEventListener('input', (e)=>{
+    clearTimeout(to);
+    const val = e.target.value.trim();
+    to = setTimeout(()=>{ state.q = val; applyFilters(); }, 200);
+  });
+}
+
+$$('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const type = btn.dataset.type;
+    const filter = btn.dataset.filter;
+    if(type==='main' && filter==='all'){
+      resetAll();
+      return;
+    }
+    // toggle simple (selección única por categoría)
+    state[type] = (state[type] && normalize(state[type])===normalize(filter)) ? null : filter;
+    applyFilters();
+  });
+});
+
+const clearBtn = document.getElementById('clearFilters');
+if (clearBtn){
+  clearBtn.addEventListener('click', resetAll);
+}
+
+// inicial
+document.addEventListener('DOMContentLoaded', ()=>{
+  render(perfumes);
+  drawChips();
+  updateActiveButtons();
+});
+
+
+
+
+
+
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97996d71d4c49c0e',t:'MTc1Njk0NjM0Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
+// === Dinámico: construir filtros de marcas desde los datos (versión deluxe) ===
+function buildBrandFilters(){
+  const el = document.getElementById('brandFilters');
+  if(!el) return;
+  const brands = Array.from(new Set(perfumes.map(p => (p.brand||'').trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'es'));
+  el.innerHTML = brands.map(b => `<button class="filter-btn px-4 py-2 rounded-full text-white font-medium transition-all duration-300" data-filter="${b.replace(/"/g,'&quot;')}" data-type="brand">${b}</button>`).join('');
+}
+document.addEventListener('click', (ev)=>{
+  const btn = ev.target.closest('.filter-btn');
+  if(!btn) return;
+  const type = btn.dataset.type, val = btn.dataset.filter;
+  if(!type || !val) return;
+  const group = Array.from(document.querySelectorAll(`.filter-btn[data-type="${type}"]`));
+  const isActive = btn.classList.contains('active');
+  group.forEach(b=>b.classList.remove('active'));
+  if(isActive){ 
+    if(type==='gender') state.gender='all'; else state[type]=null;
+  } else {
+    btn.classList.add('active');
+    state[type]=val;
+    if(type==='gender' && val!=='all'){ 
+      const allBtn = group.find(b=>b.dataset.filter==='all');
+      if(allBtn) allBtn.classList.remove('active');
+    }
+  }
+  applyFilters();
+});
+
+
+try{ buildBrandFilters(); }catch(e){}; try{ applyFilters(); }catch(e){};
+</script></body>
+</html>
